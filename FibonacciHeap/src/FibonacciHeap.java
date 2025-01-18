@@ -9,6 +9,8 @@ public class FibonacciHeap {
     public HeapNode min;
     public int sizeTrees;
     public int size;
+    public int cuts;
+    public int links;
 
     /**
      *
@@ -20,6 +22,8 @@ public class FibonacciHeap {
         min = null;
         size = 0;
         sizeTrees = 0;
+        cuts = 0;
+        links = 0;
     }
 
     /**
@@ -37,23 +41,11 @@ public class FibonacciHeap {
         new_node.mark = false;
         new_node.child = null;
         new_node.parent = null;
-        //
-        if (start == null) {
-            new_node.next = new_node;
-            new_node.prev = new_node;
-            start = new_node;
-            min = new_node;
-        } else {
-            FibonacciHeap.insert_in_between(start, new_node);
-        }
-        //
-        if (key < min.key) {
-            min = new_node;
-        }
-        sizeTrees++;
+        insert_node(new_node);
         return new_node; // should be replaced by student code
     }
 
+    // add contract
     public static void insert_in_between(HeapNode existing, HeapNode new_node) {
         HeapNode ex_next = existing.next;
         existing.next = new_node;
@@ -77,27 +69,12 @@ public class FibonacciHeap {
      *
      */
     public void deleteMin() {
-        if (min.next == min) { // min tree is the only tree in the heap
-            start = min.child;
-            min = min.child;
-        } else {
-            HeapNode child = min.child;
-            HeapNode child_prev = child.prev;
-            min.prev.next = min.child;
-            child.prev = min.prev;
-            child_prev.next = min.next;
-            min.next.prev = child_prev;
-            if (min == start) {
-                start = start.next;
-            }
-            min = null;
-        }
-        successiveLinking();
-        size--;
+        delete(min);
     }
 
+    // add contract
     public void successiveLinking() {
-        int x = (int) Math.ceil(Math.log(size) / Math.log((1 + Math.sqrt(5)) / 2)); // make sure
+        int x = (int) Math.ceil(Math.log(size) / Math.log((1 + Math.sqrt(5)) / 2)) + 1;
         HeapNode[] buckets = new HeapNode[x];
         HeapNode curr = start;
         do {
@@ -119,6 +96,7 @@ public class FibonacciHeap {
                     max_of_two.parent = min_of_two;
                     buckets[min_of_two.rank] = null;
                     min_of_two.rank++;
+                    links++;
                 }
                 buckets[min_of_two.rank] = min_of_two;
             }
@@ -126,20 +104,39 @@ public class FibonacciHeap {
         } while (curr != start);
         //
         FibonacciHeap fh = buckets_to_heap(buckets);
+        this.start = fh.start;
         this.min = fh.min;
         this.size = fh.size;
+        this.sizeTrees = fh.sizeTrees;
     }
 
+    // add contract
     public FibonacciHeap buckets_to_heap(HeapNode[] buckets) {
         FibonacciHeap fh = new FibonacciHeap();
-        int countTrees = 0;
         for (HeapNode heapNode : buckets) {
             if (heapNode != null) {
-                countTrees++;
-                fh.insert(heapNode.key, heapNode.info);// change this, update size and sizetrees
+                fh.insert_node(heapNode);
             }
         }
         return fh;
+    }
+
+    // add contract
+    public void insert_node(HeapNode node) {
+        if (start == null) {
+            node.next = node;
+            node.prev = node;
+            start = node;
+            min = node;
+        } else {
+            FibonacciHeap.insert_in_between(start, node);
+        }
+        //
+        if (node.key < min.key) {
+            min = node;
+        }
+        sizeTrees++;
+        size += node.rank;
     }
 
     /**
@@ -150,7 +147,32 @@ public class FibonacciHeap {
      * 
      */
     public void decreaseKey(HeapNode x, int diff) {
-        return; // should be replaced by student code
+        x.key -= diff;
+        if (x.parent != null && x.parent.key > x.key) {
+            if (!x.parent.mark) { // cut
+                cut_node(x);
+            } else { // cascading cut
+                while (x.parent != null && x.parent.mark) {
+                    HeapNode parent = x.parent;
+                    cut_node(x);
+                    x = parent;
+                }
+                if (x.parent != null && !x.parent.mark) {
+                    cut_node(x);
+                }
+            }
+        }
+    }
+
+    // add contract
+    public void cut_node(HeapNode node) {
+        if (node.parent.parent != null) {
+            node.parent.mark = true;
+        }
+        node.parent.child = null;
+        node.parent = null;
+        cuts++;
+        insert_node(node);
     }
 
     /**
@@ -159,7 +181,27 @@ public class FibonacciHeap {
      *
      */
     public void delete(HeapNode x) {
-        return; // should be replaced by student code
+        if (x != min) {
+            decreaseKey(x, Integer.MAX_VALUE);
+        }
+        if (min.next == min) { // min tree is the only tree in the heap
+            start = min.child;
+            min = min.child;
+        } else {
+            HeapNode child = min.child;
+            HeapNode child_prev = child.prev;
+            min.prev.next = min.child;
+            child.prev = min.prev;
+            child_prev.next = min.next;
+            min.next.prev = child_prev;
+            if (min == start) {
+                start = start.next;
+            }
+            min = null;
+        }
+        if (x == min) {
+            successiveLinking();
+        }
     }
 
     /**
@@ -168,7 +210,7 @@ public class FibonacciHeap {
      * 
      */
     public int totalLinks() {
-        return 0; // should be replaced by student code
+        return links; // should be replaced by student code
     }
 
     /**
@@ -177,7 +219,7 @@ public class FibonacciHeap {
      * 
      */
     public int totalCuts() {
-        return 0; // should be replaced by student code
+        return cuts; // should be replaced by student code
     }
 
     /**
@@ -186,7 +228,26 @@ public class FibonacciHeap {
      *
      */
     public void meld(FibonacciHeap heap2) {
-        return; // should be replaced by student code
+        cuts += heap2.cuts;
+        links += heap2.links;
+        size += heap2.size;
+        sizeTrees += heap2.sizeTrees;
+        //
+        HeapNode heap2_start = heap2.start;
+        HeapNode heap2_last = heap2.start.prev;
+        HeapNode last = start.prev;
+        // linking this's last with heap2's start
+        last.next = heap2_start;
+        heap2_start.prev = last;
+        // linking this's start with heap2's last
+        start.prev = heap2_last;
+        heap2_last.next = start;
+        //
+        if (heap2.min.key < min.key) {
+            min = heap2.min;
+        }
+        //
+        heap2 = null;
     }
 
     /**
@@ -204,7 +265,7 @@ public class FibonacciHeap {
      * 
      */
     public int numTrees() {
-        return 0; // should be replaced by student code
+        return sizeTrees; // should be replaced by student code
     }
 
     /**
