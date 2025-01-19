@@ -85,9 +85,8 @@ public class FibonacciHeap {
             min = null;
             return;
         }
-        int x = (int) Math.ceil(Math.log(size) / Math.log((1 + Math.sqrt(5)) / 2)) ;
-        System.out.println("x: " + x);
-        HeapNode[] buckets = new HeapNode[x];
+        int maxRank = (int) Math.ceil(Math.log(size) / Math.log((1 + Math.sqrt(5)) / 2));
+        HeapNode[] buckets = new HeapNode[maxRank];
         HeapNode curr = start;
         do {
             HeapNode new_node = new HeapNode();
@@ -97,14 +96,14 @@ public class FibonacciHeap {
             new_node.rank = curr.rank;
             new_node.next = new_node;
             new_node.prev = new_node;
-            if (buckets[curr.rank] == null) {
-                buckets[curr.rank] = new_node;
+            if (buckets[new_node.rank] == null) {
+                buckets[new_node.rank] = new_node;
             } else {
                 HeapNode min_of_two = new_node;
                 while (min_of_two.rank < buckets.length && buckets[min_of_two.rank] != null) {
-                    HeapNode max_of_two = buckets[curr.rank];
-                    if (buckets[curr.rank].key < curr.key) {
-                        min_of_two = buckets[curr.rank];
+                    HeapNode max_of_two = buckets[new_node.rank];
+                    if (buckets[new_node.rank].key < new_node.key) {
+                        min_of_two = buckets[new_node.rank];
                         max_of_two = new_node;
                     }
                     if (min_of_two.child != null) {
@@ -172,22 +171,16 @@ public class FibonacciHeap {
      *
      */
     public void decreaseKey(HeapNode x, int diff) {
-        if (x ==null || diff < 0 || (diff != Integer.MAX_VALUE && x.key - diff < 0)) {
-            throw new IllegalArgumentException("Invalid arguments", new Throwable("x.key: " + x.key + ", diff: " + diff));
+        if (x == null || diff < 0 || (diff != Integer.MAX_VALUE && x.key - diff < 0)) {
+            throw new IllegalArgumentException("Invalid arguments",
+                    new Throwable("x.key: " + x.key + ", diff: " + diff));
         }
         x.key -= diff;
         if (x.parent != null && x.parent.key > x.key) {
             if (!x.parent.mark) { // cut
-                cut_node(x);
+                cut(x, x.parent);
             } else { // cascading cut
-                while (x.parent != null && x.parent.mark) {
-                    HeapNode parent = x.parent;
-                    cut_node(x);
-                    x = parent;
-                }
-                if (x.parent != null && !x.parent.mark) {
-                    cut_node(x);
-                }
+                cascading_cut(x, x.parent);
             }
         }
         if (x.key < min.key) {
@@ -196,17 +189,35 @@ public class FibonacciHeap {
     }
 
     // add contract
-    public void cut_node(HeapNode node) {
+    public void cut(HeapNode node, HeapNode parent) {
         if (node == null) {
             throw new IllegalArgumentException("Node is null");
         }
-        if (node.parent.parent != null) {
-            node.parent.mark = true;
-        }
-        node.parent.child = null;
         node.parent = null;
-        cuts++;
-        insert_node(node);
+        node.mark = false;
+        parent.rank--;
+        if (node.next == node) {
+            parent.child = null;
+        } else {
+            parent.child = node.next;
+            node.prev.next = node.next;
+            node.next.prev = node.prev;
+        }
+    }
+
+    // add contract
+    public void cascading_cut(HeapNode node, HeapNode parent) {
+        if (node == null) {
+            throw new IllegalArgumentException("Node is null");
+        }
+        cut(node, parent);
+        if (parent.parent != null) {
+            if (!parent.mark) {
+                parent.mark = true;
+            } else {
+                cascading_cut(parent, parent.parent);
+            }
+        }
     }
 
     /**
@@ -227,9 +238,9 @@ public class FibonacciHeap {
             int x_rank = x.rank;
             HeapNode first_child = x.child;
             HeapNode last_child = first_child.prev;
-            if (x.next == x){ // x is the root of the only tree in the heap
+            if (x.next == x) { // x is the root of the only tree in the heap
                 start = first_child;
-            } else{ // x is not the root of the only tree in the heap - there are more trees
+            } else { // x is not the root of the only tree in the heap - there are more trees
                 x.prev.next = x.child;
                 first_child.prev = x.prev;
                 last_child.next = x.next;
