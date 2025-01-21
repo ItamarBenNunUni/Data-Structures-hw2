@@ -101,9 +101,9 @@ public class FibonacciHeap {
             } else {
                 HeapNode min_of_two = new_node;
                 while (min_of_two.rank < buckets.length && buckets[min_of_two.rank] != null) {
-                    HeapNode max_of_two = buckets[new_node.rank];
-                    if (buckets[new_node.rank].key < new_node.key) {
-                        min_of_two = buckets[new_node.rank];
+                    HeapNode max_of_two = buckets[min_of_two.rank];
+                    if (buckets[min_of_two.rank].key < new_node.key) {
+                        min_of_two = buckets[min_of_two.rank];
                         max_of_two = new_node;
                     }
                     if (min_of_two.child != null) {
