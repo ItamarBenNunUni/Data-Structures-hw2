@@ -48,7 +48,11 @@ public class FibonacciHeap {
         return new_node; // should be replaced by student code
     }
 
-    // add contract
+    /**
+     *
+     * Inserts a node after an existing node as it's next
+     *
+     */
     public static void insert_in_between(HeapNode existing, HeapNode new_node) {
         if (existing == null || new_node == null) {
             throw new IllegalArgumentException("Node is null");
@@ -78,17 +82,24 @@ public class FibonacciHeap {
         delete(min);
     }
 
-    // add contract
+    /**
+     *
+     * Performs Consolidating/Successive Linking to fix a head
+     *
+     */
     public void successiveLinking() {
+        // edge case
         if (size == 0) {
             start = null;
             min = null;
             return;
         }
+        // build the buckets
         int maxRank = (int) Math.ceil(Math.log(size) / Math.log((1 + Math.sqrt(5)) / 2));
         HeapNode[] buckets = new HeapNode[maxRank + 1];
         HeapNode curr = start;
         do {
+            // isolate the current node from it's brothers
             HeapNode new_node = new HeapNode();
             new_node.key = curr.key;
             new_node.info = curr.info;
@@ -96,17 +107,18 @@ public class FibonacciHeap {
             new_node.rank = curr.rank;
             new_node.next = new_node;
             new_node.prev = new_node;
-            if (buckets[new_node.rank] == null) {
+            if (buckets[new_node.rank] == null) {// the bucket is empty
                 buckets[new_node.rank] = new_node;
-            } else {
-                HeapNode min_of_two = new_node;
-                while (min_of_two.rank < buckets.length && buckets[min_of_two.rank] != null) {
-                    HeapNode max_of_two = buckets[min_of_two.rank];
+            } else {// the bucket has a tree with same rank
+                HeapNode min_of_two = new_node;// arbitrary pick - may be updated
+                while (min_of_two.rank < buckets.length && buckets[min_of_two.rank] != null) {// continue linking until
+                                                                                              // bucket is empty
+                    HeapNode max_of_two = buckets[min_of_two.rank];// arbitrary pick - may be updated
                     if (buckets[min_of_two.rank].key < new_node.key) {
                         min_of_two = buckets[min_of_two.rank];
                         max_of_two = new_node;
                     }
-                    if (min_of_two.child != null) {
+                    if (min_of_two.child != null) {// link the two trees
                         FibonacciHeap.insert_in_between(min_of_two.child, max_of_two);
                     } else {
                         min_of_two.child = max_of_two;
@@ -120,14 +132,18 @@ public class FibonacciHeap {
             }
             curr = curr.next;
         } while (curr != start);
-        //
+        // build a new heap out of the buckets
         FibonacciHeap fh = buckets_to_heap(buckets);
         this.start = fh.start;
         this.min = fh.min;
         this.sizeTrees = fh.sizeTrees;
     }
 
-    // add contract
+    /**
+     *
+     * Turns buckets to a Fibonacci Heap
+     *
+     */
     public FibonacciHeap buckets_to_heap(HeapNode[] buckets) {
         if (buckets == null) {
             throw new IllegalArgumentException("Buckets is null");
@@ -141,7 +157,11 @@ public class FibonacciHeap {
         return fh;
     }
 
-    // add contract
+    /**
+     *
+     * Inserts a new node into the heap, given that complete node
+     *
+     */
     public void insert_node(HeapNode node) {
         if (node == null) {
             throw new IllegalArgumentException("Node is null");
@@ -176,9 +196,9 @@ public class FibonacciHeap {
         }
         x.key -= diff;
         if (x.parent != null && x.parent.key > x.key) {
-            if (!x.parent.mark) { // cut
+            if (!x.parent.mark) {
                 cut(x, x.parent);
-            } else { // cascading cut
+            } else {
                 cascading_cut(x, x.parent);
             }
         }
@@ -187,7 +207,13 @@ public class FibonacciHeap {
         }
     }
 
-    // add contract
+    /**
+     *
+     * pre: parent != null
+     * 
+     * Cut node from his parent
+     *
+     */
     public void cut(HeapNode node, HeapNode parent) {
         if (node == null) {
             throw new IllegalArgumentException("Node is null");
@@ -202,9 +228,16 @@ public class FibonacciHeap {
             node.prev.next = node.next;
             node.next.prev = node.prev;
         }
+        cuts++;
     }
 
-    // add contract
+    /**
+     * 
+     * pre: parent != null
+     * 
+     * Performs Cascading Cuts from node
+     *
+     */
     public void cascading_cut(HeapNode node, HeapNode parent) {
         if (node == null) {
             throw new IllegalArgumentException("Node is null");
@@ -309,11 +342,11 @@ public class FibonacciHeap {
         // linking this's start with heap2's last
         start.prev = heap2_last;
         heap2_last.next = start;
-        //
+        // min updating
         if (heap2.min.key < min.key) {
             min = heap2.min;
         }
-        //
+        // heap2 is of no use anymore
         heap2 = null;
     }
 
