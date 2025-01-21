@@ -86,7 +86,7 @@ public class FibonacciHeap {
             return;
         }
         int maxRank = (int) Math.ceil(Math.log(size) / Math.log((1 + Math.sqrt(5)) / 2));
-        HeapNode[] buckets = new HeapNode[maxRank];
+        HeapNode[] buckets = new HeapNode[maxRank + 1];
         HeapNode curr = start;
         do {
             HeapNode new_node = new HeapNode();
@@ -124,7 +124,6 @@ public class FibonacciHeap {
         FibonacciHeap fh = buckets_to_heap(buckets);
         this.start = fh.start;
         this.min = fh.min;
-        this.size = fh.size;
         this.sizeTrees = fh.sizeTrees;
     }
 
@@ -160,7 +159,7 @@ public class FibonacciHeap {
             min = node;
         }
         sizeTrees++;
-        size += node.rank + 1;
+        size++;
     }
 
     /**

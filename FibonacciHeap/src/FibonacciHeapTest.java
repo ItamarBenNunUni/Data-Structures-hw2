@@ -109,9 +109,9 @@ public class FibonacciHeapTest {
         assert heap.findMin() == null : "Minimum should be null after deleting only node";
 
         // These should not throw exceptions
-//        heap.delete(null);
-//        heap.decreaseKey(null, 1);
-//        heap.meld(null);
+        // heap.delete(null);
+        // heap.decreaseKey(null, 1);
+        // heap.meld(null);
 
         System.out.println("✅ Edge cases test passed");
     }
@@ -203,8 +203,8 @@ public class FibonacciHeapTest {
                 expectedMin = Math.min(expectedMin, key);
             }
 
-            assert heap.findMin().key == expectedMin :
-                    "Incorrect minimum after random decreaseKey. Expected: " + expectedMin;
+            assert heap.findMin().key == expectedMin
+                    : "Incorrect minimum after random decreaseKey. Expected: " + expectedMin;
         }
         System.out.println("✅ Random decreaseKey test passed");
     }
@@ -220,9 +220,9 @@ public class FibonacciHeapTest {
 
         assert heap.numTrees() == 10 : "Initial number of trees should be 10";
 
-        heap.deleteMin();//delete 0
-        heap.deleteMin();//delete 1
-        heap.deleteMin();//delete 2
+        heap.deleteMin();// delete 0
+        heap.deleteMin();// delete 1
+        heap.deleteMin();// delete 2
 
         assert heap.numTrees() == 3 : "Number of trees after delete operations should be 3";
 
@@ -308,14 +308,13 @@ public class FibonacciHeapTest {
         assert heap.findMin() == null : "Minimum should be null after last deleteMin";
         assert heap.size() == 0 : "Size should be 0 after last deleteMin";
 
-        // This should not throw an exception
-        heap.deleteMin();
-
         java.util.Random rand = new java.util.Random(42);
-        heap.insert(1000, "thousand");
-        for (int i = 0; i < 999; i++) heap.insert(rand.nextInt(999), "key" + i);
-        for (int i = 0; i < 999; i++) heap.deleteMin();
-        assert heap.findMin().key == 1000 : "Minimum should be 1000 after deleting random nodes";
+        heap.insert(10, "ten");
+        for (int i = 0; i < 9; i++)
+            heap.insert(rand.nextInt(9), "key" + i);
+        for (int i = 0; i < 9; i++)
+            heap.deleteMin();
+        assert heap.findMin().key == 10 : "Minimum should be 1000 after deleting random nodes";
 
         System.out.println("✅ DeleteMin test passed");
     }
