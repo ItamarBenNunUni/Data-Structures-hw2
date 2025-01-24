@@ -95,7 +95,7 @@ public class FibonaccoHeapExperiment {
         }
         System.out.printf(
                 "Average time: %.2f ms, Average size: %.2f, Average links: %.2f, Average cuts: %.2f, Average trees: %.2f%n",
-                (timeSum / 1), (sizeSum / 1), (linkSum / 1), (cutSum / 1), (treeSum / 1));
+                (timeSum / 20), (sizeSum / 20), (linkSum / 20), (cutSum / 20), (treeSum / 20));
     }
 
     public static void main(String[] args) {

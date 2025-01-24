@@ -194,11 +194,7 @@ public class FibonacciHeap {
         }
         x.key -= diff;
         if (x.parent != null && x.parent.key > x.key) {
-            if (!x.parent.mark) {
-                cut(x, x.parent);
-            } else {
-                cascading_cut(x, x.parent);
-            }
+            cascading_cut(x, x.parent);
         }
         if (x.key < min.key) {
             min = x;
