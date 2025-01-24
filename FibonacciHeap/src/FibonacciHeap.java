@@ -113,8 +113,8 @@ public class FibonacciHeap {
                 HeapNode min_node = curr;
                 while (buckets[r] != null) {
                     HeapNode existing = buckets[r];
-                    min_node = (min_node.key >= existing.key) ? existing : min_node;
                     HeapNode max_node = (min_node.key <= existing.key) ? existing : min_node;
+                    min_node = (min_node.key >= existing.key) ? existing : min_node;
                     if (min_node.child != null) {
                         FibonacciHeap.insert_after(min_node.child, max_node);
                     } else {
@@ -208,7 +208,7 @@ public class FibonacciHeap {
     /**
      *
      * pre: parent != null
-     * 
+     *
      * Cut node from his parent
      *
      */
@@ -232,9 +232,9 @@ public class FibonacciHeap {
     }
 
     /**
-     * 
+     *
      * pre: parent != null
-     * 
+     *
      * Performs Cascading Cuts from node
      *
      */

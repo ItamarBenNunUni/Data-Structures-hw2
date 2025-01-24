@@ -68,7 +68,7 @@ public class FibonaccoHeapExperiment {
 
     public static void ThirdExperiment(int n) {
         double timeSum = 0, sizeSum = 0, linkSum = 0, cutSum = 0, treeSum = 0;
-        for (int j = 1; j <= 1; j++) {
+        for (int j = 1; j <= 20; j++) {
             Instant start = Instant.now();
             FibonacciHeap heap = new FibonacciHeap();
             Integer[] keys = new Integer[n];
@@ -99,15 +99,16 @@ public class FibonaccoHeapExperiment {
     }
 
     public static void main(String[] args) {
-        for (int i = 1; i <= 1; i++) {
+        for (int i = 1; i <= 5; i++) {
             int n = (int) (Math.pow(3, i + 7) - 1);
-            System.out.println(n);
-            System.out.println("First");
+            System.out.println("************************************************************************");
+            System.out.println( "i = "+i+", n = "+ n);
+            System.out.println("First:");
             FirstExperiment(n);
-            System.out.println("Second");
+            System.out.println("Second:");
             SecondExperiment(n);
-            // System.out.println("Third");
-            // ThirdExperiment(n);
+             System.out.println("Third:");
+             ThirdExperiment(n);
         }
     }
 }
