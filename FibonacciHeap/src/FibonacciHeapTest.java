@@ -581,15 +581,15 @@ public class FibonacciHeapTest {
 	private static void testMeldTwoFullHeaps(TestSuite suite) {
 		FibonacciHeap heap1 = new FibonacciHeap();
 		FibonacciHeap heap2 = new FibonacciHeap();
-		for (int i = 1; i <= 5; i++) {
+		for (int i = 6; i <= 10; i++) {
 			heap1.insert(i, "");
 		}
 		heap1.deleteMin();
-		for (int i = 6; i <= 10; i++) {
+		for (int i = 1; i <= 5; i++) {
 			heap2.insert(i, "");
 		}
 		heap1.meld(heap2);
-		heapStateTest(suite, heap1, 2, 9, 6, 0, 3);
+		heapStateTest(suite, heap1, 1, 9, 6, 0, 3);
 	}
 
 	private static void testMeld(TestSuite suite) {
