@@ -63,11 +63,11 @@ public class FibonacciHeap {
         if (existing == null || new_node == null) {
             throw new IllegalArgumentException("Node is null");
         }
-        HeapNode ex_next = existing.next;
-        existing.next = new_node;
-        ex_next.prev = new_node;
-        new_node.prev = existing;
-        new_node.next = ex_next;
+        HeapNode ex_prev = existing.prev;
+        existing.prev = new_node;
+        ex_prev.next = new_node;
+        new_node.next = existing;
+        new_node.prev = ex_prev;
         new_node.parent = existing.parent;
         if (existing.parent != null) {
             existing.parent.rank++;
@@ -120,7 +120,10 @@ public class FibonacciHeap {
                 while (buckets[r] != null) {
                     HeapNode existing = buckets[r];
                     HeapNode max_node = (min_node.key <= existing.key) ? existing : min_node;
-                    min_node = (min_node.key >= existing.key) ? existing : min_node;
+                    // min_node = (min_node.key >= existing.key) ? existing : min_node;
+                    if (max_node == min_node) {
+                        min_node = existing;
+                    }
                     if (min_node.child != null) {
                         FibonacciHeap.insert_after(min_node.child, max_node);
                     } else {
@@ -194,7 +197,10 @@ public class FibonacciHeap {
      *
      */
     public void decreaseKey(HeapNode x, int diff) {
-        if (x == null || diff < 0 || (diff != Integer.MAX_VALUE && x.key - diff < 0)) {
+        if (x == null) {
+            throw new IllegalArgumentException("Node is null");
+        }
+        if (diff < 0 || (diff != Integer.MAX_VALUE && x.key - diff < 0)) {
             throw new IllegalArgumentException("Invalid arguments",
                     new Throwable("x.key: " + x.key + ", diff: " + diff));
         }
@@ -335,6 +341,44 @@ public class FibonacciHeap {
         if (heap2 == null) {
             throw new IllegalArgumentException("Heap is null");
         }
+        if (heap2.start == null) {
+            return;
+        }
+        if (start == null) {
+            start = new HeapNode();
+            start.key = heap2.start.key;
+            start.info = heap2.start.info;
+            start.child = heap2.start.child;
+            start.next = heap2.start.next;
+            start.prev = heap2.start.prev;
+            start.parent = heap2.start.parent;
+            start.rank = heap2.start.rank;
+            start.mark = heap2.start.mark;
+            //
+            min = new HeapNode();
+            min.key = heap2.min.key;
+            min.info = heap2.min.info;
+            min.child = heap2.min.child;
+            min.next = heap2.min.next;
+            min.prev = heap2.min.prev;
+            min.parent = heap2.min.parent;
+            min.rank = heap2.min.rank;
+            min.mark = heap2.min.mark;
+            //
+            cuts = heap2.cuts;
+            links = heap2.links;
+            size = heap2.size;
+            sizeTrees = heap2.sizeTrees;
+            //
+            heap2.start = null;
+            heap2.min = null;
+            heap2.size = 0;
+            heap2.sizeTrees = 0;
+            heap2.cuts = 0;
+            heap2.links = 0;
+            //
+            return;
+        }
         cuts += heap2.cuts;
         links += heap2.links;
         size += heap2.size;
@@ -354,7 +398,12 @@ public class FibonacciHeap {
             min = heap2.min;
         }
         // heap2 is of no use anymore
-        heap2 = null;
+        heap2.start = null;
+        heap2.min = null;
+        heap2.size = 0;
+        heap2.sizeTrees = 0;
+        heap2.cuts = 0;
+        heap2.links = 0;
     }
 
     /**
