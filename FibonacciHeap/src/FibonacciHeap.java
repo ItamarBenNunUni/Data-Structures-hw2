@@ -1,9 +1,3 @@
-// id1: 322520255
-// name1: Itamar Ben Nun
-// username1: itamarbennun
-// id2: 316061787
-// name2: Tal Malka
-// username2: talmalka2
 /**
  * FibonacciHeap
  *
